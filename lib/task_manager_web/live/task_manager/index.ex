@@ -18,6 +18,7 @@ defmodule TaskManagerWeb.TaskLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
+    <.task_input form={@form} />
     <.tasks_table tasks={@tasks} />
     """
   end
@@ -35,5 +36,21 @@ defmodule TaskManagerWeb.TaskLive.Index do
       end)
 
     {:noreply, assign(socket, :tasks, tasks)}
+  end
+
+  @impl true
+  def handle_event("save", %{"name" => task_name}, socket) do
+    id =
+      socket.assigns.tasks
+      |> Enum.reduce(0, fn task, acc ->
+        if task.id > acc, do: task.id, else: acc
+      end)
+
+    tasks = socket.assigns.tasks ++ [%{id: id + 1, name: task_name, status: false}]
+
+    {:noreply,
+     socket
+     |> assign(tasks: tasks)
+     |> assign(:form, to_form(%{"id" => 0, "name" => "", "status" => false}))}
   end
 end

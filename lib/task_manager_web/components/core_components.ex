@@ -470,7 +470,7 @@ defmodule TaskManagerWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-      attr :tasks, :list, required: true
+  attr :tasks, :list, required: true
 
   def tasks_table(assigns) do
     ~H"""
@@ -495,6 +495,17 @@ defmodule TaskManagerWeb.CoreComponents do
         </div>
       </div>
     </div>
+    """
+  end
+
+  
+  attr :form, :any, required: true
+  attr :input, :atom, default: :title
+  def task_input(assigns) do
+    ~H"""
+    <.form for={@form} id="task-form" phx-submit="save">
+      <.input field={@form[:name]} type="text" label="Task" />
+    </.form>
     """
   end
 end
