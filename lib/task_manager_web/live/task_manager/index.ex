@@ -3,15 +3,11 @@ defmodule TaskManagerWeb.TaskLive.Index do
 
   @impl true
   def mount(_params, _sessions, socket) do
-    dummy_tasks = [
-      %{id: 0, name: "Go to Mars", status: false},
-      %{id: 1, name: "By a rocket", status: true},
-      %{id: 2, name: "Clean your base", status: false}
-    ]
+    tasks = TaskManager.Todo.list_tasks()
 
     {:ok,
      socket
-     |> assign(:tasks, dummy_tasks)
+     |> assign(:tasks, tasks)
      |> assign(:form, to_form(%{"id" => 0, "name" => "", "status" => false}))}
   end
 
