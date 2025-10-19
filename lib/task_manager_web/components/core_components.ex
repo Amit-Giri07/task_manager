@@ -498,12 +498,12 @@ defmodule TaskManagerWeb.CoreComponents do
     """
   end
 
-  
+
   attr :form, :any, required: true
   attr :input, :atom, default: :title
   def task_input(assigns) do
     ~H"""
-    <.form for={@form} id="task-form" phx-submit="save">
+    <.form for={@form} id="task-form" phx-submit="save" phx-change="validate">
       <.input field={@form[:name]} type="text" label="Task" />
     </.form>
     """

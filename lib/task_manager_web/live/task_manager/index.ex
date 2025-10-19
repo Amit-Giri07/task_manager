@@ -58,4 +58,16 @@ defmodule TaskManagerWeb.TaskLive.Index do
      |> assign(tasks: tasks)
      |> assign(:form, to_form(Todo.change_task(%Task{})))}
   end
+
+   @impl true
+  def handle_event("validate", %{"task" => task}, socket) do
+    form =
+      %Task{}
+      |> Todo.change_task(task)
+      |> to_form(action: :validate)
+
+    {:noreply,
+     socket
+     |> assign(:form, form)}
+  end
 end
