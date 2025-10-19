@@ -3,8 +3,9 @@ defmodule TaskManager.Todo.Task do
   import Ecto.Changeset
 
   schema "todo_task" do
+    field :name, :string
     field :status, :boolean, default: false
-    field :task, :string
+    # field :task, :string
 
     timestamps(type: :utc_datetime)
   end
