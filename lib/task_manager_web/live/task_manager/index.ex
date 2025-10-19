@@ -1,14 +1,16 @@
 defmodule TaskManagerWeb.TaskLive.Index do
   use TaskManagerWeb, :live_view
+  alias TaskManager.Todo
+  alias TaskManager.Todo.Task
 
   @impl true
   def mount(_params, _sessions, socket) do
-    tasks = TaskManager.Todo.list_tasks()
+    tasks = Todo.list_tasks()
 
     {:ok,
      socket
      |> assign(:tasks, tasks)
-     |> assign(:form, to_form(%{"id" => 0, "name" => "", "status" => false}))}
+     |> assign(:form, to_form(Todo.change_task(%Task{})))}
   end
 
   @impl true
@@ -24,7 +26,7 @@ defmodule TaskManagerWeb.TaskLive.Index do
     tasks =
       socket.assigns.tasks
       |> Enum.map(fn task ->
-        if task.id == id do
+        if task.id == String.to_integer(id) do
           Map.update!(task, :status, fn status -> !status end)
         else
           task
@@ -38,15 +40,13 @@ defmodule TaskManagerWeb.TaskLive.Index do
   def handle_event("save", %{"name" => task_name}, socket) do
     id =
       socket.assigns.tasks
-      |> Enum.reduce(0, fn task, acc ->
-        if task.id > acc, do: task.id, else: acc
-      end)
+      |> Enum.reduce(0, fn task, acc -> if task.id > acc, do: task.id, else: acc end)
 
-    tasks = socket.assigns.tasks ++ [%{id: id + 1, name: task_name, status: false}]
+    tasks = socket.assigns.tasks ++ [%{id: id + 1, task: task_name, status: false}]
 
     {:noreply,
      socket
-     |> assign(tasks: tasks)
-     |> assign(:form, to_form(%{"id" => 0, "name" => "", "status" => false}))}
+     |> assign(:tasks, tasks)
+     |> assign(:form, to_form(Todo.change_task(%Task{})))}
   end
 end
