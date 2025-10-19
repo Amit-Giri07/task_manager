@@ -16,24 +16,22 @@ defmodule TaskManagerWeb.TaskLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <.task_input form={@form} />
-    <.tasks_table tasks={@tasks} />
+    <.task_input form={@form} /> <.tasks_table tasks={@tasks} />
     """
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
+    Todo.delete_task(id)
+
     tasks =
       socket.assigns.tasks
-      |> Enum.map(fn task ->
-        if task.id == String.to_integer(id) do
-          Map.update!(task, :status, fn status -> !status end)
-        else
-          task
-        end
-      end)
+      |> Enum.filter(fn task -> task.id != id end)
 
-    {:noreply, assign(socket, :tasks, tasks)}
+    {:noreply,
+     socket
+     |> assign(:tasks, tasks)
+     |> assign(:form, to_form(Todo.change_task(%Task{})))}
   end
 
   @impl true
@@ -47,6 +45,17 @@ defmodule TaskManagerWeb.TaskLive.Index do
     {:noreply,
      socket
      |> assign(:tasks, tasks)
+     |> assign(:form, to_form(Todo.change_task(%Task{})))}
+  end
+
+  @impl true
+  def handle_event("save", %{"task" => task}, socket) do
+    {:ok, task} = Todo.create_task(task)
+    tasks = socket.assigns.tasks ++ [task]
+
+    {:noreply,
+     socket
+     |> assign(tasks: tasks)
      |> assign(:form, to_form(Todo.change_task(%Task{})))}
   end
 end
