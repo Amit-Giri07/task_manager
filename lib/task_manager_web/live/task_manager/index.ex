@@ -50,16 +50,25 @@ defmodule TaskManagerWeb.TaskLive.Index do
 
   @impl true
   def handle_event("save", %{"task" => task}, socket) do
-    {:ok, task} = Todo.create_task(task)
-    tasks = socket.assigns.tasks ++ [task]
+    case Todo.create_task(task) do
+      {:ok, task} ->
+        tasks = socket.assigns.tasks ++ [task]
 
-    {:noreply,
-     socket
-     |> assign(tasks: tasks)
-     |> assign(:form, to_form(Todo.change_task(%Task{})))}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Task created successfully")
+         |> assign(tasks: tasks)
+         |> assign(:form, to_form(Todo.change_task(%Task{})))}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Error while creating task")
+         |> assign(form: to_form(changeset))}
+    end
   end
 
-   @impl true
+  @impl true
   def handle_event("validate", %{"task" => task}, socket) do
     form =
       %Task{}
